@@ -8,7 +8,12 @@
 package roadgraph;
 
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -23,7 +28,7 @@ import util.GraphLoader;
  *
  */
 public class MapGraph {
-	//TODO: Add your member variables here in WEEK 3
+	private HashMap<GeographicPoint, MapNode> nodes;
 	
 	
 	/** 
@@ -31,7 +36,7 @@ public class MapGraph {
 	 */
 	public MapGraph()
 	{
-		// TODO: Implement in this constructor in WEEK 3
+		nodes = new HashMap<GeographicPoint, MapNode>();
 	}
 	
 	/**
@@ -40,8 +45,7 @@ public class MapGraph {
 	 */
 	public int getNumVertices()
 	{
-		//TODO: Implement this method in WEEK 3
-		return 0;
+		return nodes.size();
 	}
 	
 	/**
@@ -50,8 +54,7 @@ public class MapGraph {
 	 */
 	public Set<GeographicPoint> getVertices()
 	{
-		//TODO: Implement this method in WEEK 3
-		return null;
+		return nodes.keySet();
 	}
 	
 	/**
@@ -60,8 +63,11 @@ public class MapGraph {
 	 */
 	public int getNumEdges()
 	{
-		//TODO: Implement this method in WEEK 3
-		return 0;
+		int numEdges = 0;
+		for (MapNode n : nodes.values()) {
+			numEdges += n.getEdges().size();
+		}
+		return numEdges;
 	}
 
 	
@@ -75,7 +81,10 @@ public class MapGraph {
 	 */
 	public boolean addVertex(GeographicPoint location)
 	{
-		// TODO: Implement this method in WEEK 3
+		if (!nodes.containsKey(location)) {
+			nodes.put(location, new MapNode(location.getX(), location.getY()));
+			return true;
+		}
 		return false;
 	}
 	
@@ -93,9 +102,10 @@ public class MapGraph {
 	 */
 	public void addEdge(GeographicPoint from, GeographicPoint to, String roadName,
 			String roadType, double length) throws IllegalArgumentException {
-
-		//TODO: Implement this method in WEEK 3
-		
+		if (length < 0 || !nodes.containsKey(from) || !nodes.containsKey(to) || roadName == null || roadType == null) throw new IllegalArgumentException();
+		MapNode start = nodes.get(from);
+		MapEdge edge = new MapEdge(from, to, roadName, roadType, length);
+		start.addEdge(edge);
 	}
 	
 
@@ -123,12 +133,41 @@ public class MapGraph {
 	public List<GeographicPoint> bfs(GeographicPoint start, 
 			 					     GeographicPoint goal, Consumer<GeographicPoint> nodeSearched)
 	{
-		// TODO: Implement this method in WEEK 3
+		HashMap<MapNode, MapNode> parents = new HashMap<>(); // maps child to parent
+		Queue<MapNode> q = new LinkedList<MapNode>();
+		q.add(nodes.get(start));
 		
-		// Hook for visualization.  See writeup.
-		//nodeSearched.accept(next.getLocation());
-
-		return null;
+		boolean found = false;
+		while (!q.isEmpty()) {
+			MapNode cur = q.poll();
+			nodeSearched.accept(cur.getLocation());
+			if (cur.getLocation().equals(goal)) {
+				found = true;
+				break;
+			}
+			for (MapEdge e : cur.getEdges()) {
+				MapNode next = nodes.get(e.getEnd());
+				if (!parents.containsKey(next)) {
+					parents.put(next, cur);
+					q.add(next);
+				}
+			}
+		}
+		
+		if (!found) {
+			return null;
+		}
+		
+		MapNode cur = nodes.get(goal);
+		LinkedList<GeographicPoint> path = new LinkedList<>();
+		path.addFirst(cur.getLocation());
+		
+		while (!cur.getLocation().equals(start)) {
+			cur = parents.get(cur);
+			path.addFirst(cur.getLocation());
+		}
+		
+		return path;
 	}
 	
 
