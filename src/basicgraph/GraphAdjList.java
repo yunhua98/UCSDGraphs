@@ -95,8 +95,12 @@ public class GraphAdjList extends Graph {
 	 * @return List<Integer> a list of indices of vertices.  
 	 */		
 	 public List<Integer> getDistance2(int v) {
-		 // XXX: Implement this method in week 2
-		 return null;
+		 List<Integer> oneHop = getNeighbors(v);
+		 List<Integer> twoHop = new ArrayList<>();
+		 for (int i : oneHop) {
+			 twoHop.addAll(getNeighbors(i));
+		 }
+		 return twoHop;
 	}
 	
 	/**
