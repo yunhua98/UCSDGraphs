@@ -233,6 +233,8 @@ public class MapGraph {
 			path.addFirst(cur.getLocation());
 		}
 		
+		for (MapNode n : parents.keySet()) n.resetDistances();
+		
 		return path;
 	}
 
@@ -260,12 +262,50 @@ public class MapGraph {
 	public List<GeographicPoint> aStarSearch(GeographicPoint start, 
 											 GeographicPoint goal, Consumer<GeographicPoint> nodeSearched)
 	{
-		// TODO: Implement this method in WEEK 4
+		boolean found = false;
+		MapNode cur = nodes.get(start);
+		HashMap<MapNode, MapNode> parents = new HashMap<>();
+		cur.setShortestDistance(0);
+		cur.setEstimatedDistance(cur.getLocation().distance(goal));
+		Queue<MapNode> q = new PriorityQueue<>();
+		q.add(cur);
+		while (!q.isEmpty()) {
+			cur = q.poll();
+			double distance = cur.getShortestDistance();
+			GeographicPoint startLoc = cur.getLocation();
+			nodeSearched.accept(startLoc);
+			if (startLoc.equals(goal)) {
+				found = true;
+				break;
+			}
+			for (MapEdge edge : cur.getEdges()) {
+				GeographicPoint p = edge.getEnd();
+				MapNode next = nodes.get(p);
+				double newDist = distance + startLoc.distance(p);
+				double estDist = p.distance(goal);
+				if (newDist + estDist < next.getEstimatedTotalDistance()) {
+					next.setShortestDistance(newDist);
+					next.setEstimatedDistance(estDist);
+					parents.put(next, cur);
+					q.add(next);
+				}
+			}
+		}
 		
-		// Hook for visualization.  See writeup.
-		//nodeSearched.accept(next.getLocation());
+		if (!found) return null;
 		
-		return null;
+		cur = nodes.get(goal);
+		LinkedList<GeographicPoint> path = new LinkedList<>();
+		path.addFirst(cur.getLocation());
+		
+		while (!cur.getLocation().equals(start)) {
+			cur = parents.get(cur);
+			path.addFirst(cur.getLocation());
+		}
+		
+		for (MapNode n : parents.keySet()) n.resetDistances();
+		
+		return path;
 	}
 
 	
