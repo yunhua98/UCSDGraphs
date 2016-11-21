@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -154,9 +155,7 @@ public class MapGraph {
 			}
 		}
 		
-		if (!found) {
-			return null;
-		}
+		if (!found) return null;
 		
 		MapNode cur = nodes.get(goal);
 		LinkedList<GeographicPoint> path = new LinkedList<>();
@@ -196,12 +195,45 @@ public class MapGraph {
 	public List<GeographicPoint> dijkstra(GeographicPoint start, 
 										  GeographicPoint goal, Consumer<GeographicPoint> nodeSearched)
 	{
-		// TODO: Implement this method in WEEK 4
-
-		// Hook for visualization.  See writeup.
-		//nodeSearched.accept(next.getLocation());
+		boolean found = false;
+		MapNode cur = nodes.get(start);
+		HashMap<MapNode, MapNode> parents = new HashMap<>();
+		cur.setShortestDistance(0);
+		Queue<MapNode> q = new PriorityQueue<>();
+		q.add(cur);
+		while (!q.isEmpty()) {
+			cur = q.poll();
+			double distance = cur.getShortestDistance();
+			GeographicPoint startLoc = cur.getLocation();
+			nodeSearched.accept(startLoc);
+			if (startLoc.equals(goal)) {
+				found = true;
+				break;
+			}
+			for (MapEdge edge : cur.getEdges()) {
+				GeographicPoint p = edge.getEnd();
+				MapNode next = nodes.get(p);
+				double newDist = distance + startLoc.distance(p);
+				if (newDist < next.getShortestDistance()) {
+					next.setShortestDistance(newDist);
+					parents.put(next, cur);
+					q.add(next);
+				}
+			}
+		}
 		
-		return null;
+		if (!found) return null;
+		
+		cur = nodes.get(goal);
+		LinkedList<GeographicPoint> path = new LinkedList<>();
+		path.addFirst(cur.getLocation());
+		
+		while (!cur.getLocation().equals(start)) {
+			cur = parents.get(cur);
+			path.addFirst(cur.getLocation());
+		}
+		
+		return path;
 	}
 
 	/** Find the path from start to goal using A-Star search
