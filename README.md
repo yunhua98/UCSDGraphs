@@ -57,7 +57,7 @@ Feel free to use another IDE or manually compile and run your programs.
 If you need help, google is your friend.
 ```
 
-Intersection Data Screenshot:
+Intersection Data:
 
 <img src='intersection_data.png'>
 
