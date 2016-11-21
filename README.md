@@ -1,11 +1,4 @@
-Intersection Data Screenshot:
-
-<img src='intersection_data.png'>
-
-A* Route & Nodes Visited:
-
-<img src='a_star_path.png'>
-
+``
 /-------------------------------------------------------------------------
 / Starter Code and GUI Application for Course 3 in the
 / Java Programming: Object Oriented Design of 
@@ -62,3 +55,12 @@ Importing Project into eclipse:
 
 Feel free to use another IDE or manually compile and run your programs.
 If you need help, google is your friend.
+``
+
+Intersection Data Screenshot:
+
+<img src='intersection_data.png'>
+
+A* Route & Nodes Visited:
+
+<img src='a_star_path.png'>
